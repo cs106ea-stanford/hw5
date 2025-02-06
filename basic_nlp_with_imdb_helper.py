@@ -195,25 +195,30 @@ def prepare_dataloader(X, y, batch_size=32):
                             torch.tensor(y, dtype=torch.float32))
     return DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-# Extract train, validation, and test sets
-X_train_tfidf, X_val_tfidf, X_test_tfidf = vectorized_data['TFIDF_5000']
-y_train = [imdb["train"].dataset[i]["label"] for i in imdb["train"].indices]
-y_val = [imdb["validation"].dataset[i]["label"] for i in imdb["validation"].indices]
-y_test = imdb["test"]["label"]  # This remains the same because imdb["test"] is a DatasetDict
+def prepare_data():
+    global model, train_loader, val_loader
+    global X_test_tfidf, y_test
 
-# Convert labels to NumPy arrays for compatibility with TensorDataset
-y_train, y_val, y_test = np.array(y_train), np.array(y_val), np.array(y_test)
+    # Extract train, validation, and test sets
+    X_train_tfidf, X_val_tfidf, X_test_tfidf = vectorized_data['TFIDF_5000']
+    y_train = [imdb["train"].dataset[i]["label"] for i in imdb["train"].indices]
+    y_val = [imdb["validation"].dataset[i]["label"] for i in imdb["validation"].indices]
+    y_test = imdb["test"]["label"]  # This remains the same because imdb["test"] is a DatasetDict
 
-# Create DataLoaders
-train_loader = prepare_dataloader(X_train_tfidf, y_train, batch_size=32)
-val_loader = prepare_dataloader(X_val_tfidf, y_val, batch_size=32)
+    # Convert labels to NumPy arrays for compatibility with TensorDataset
+    y_train, y_val, y_test = np.array(y_train), np.array(y_val), np.array(y_test)
 
-# Initialize the model
-input_size = X_train_tfidf.shape[1]
-model = SentimentClassifier(input_size).to(device)
+    # Create DataLoaders
+    train_loader = prepare_dataloader(X_train_tfidf, y_train, batch_size=32)
+    val_loader = prepare_dataloader(X_val_tfidf, y_val, batch_size=32)
+
+    # Initialize the model
+    input_size = X_train_tfidf.shape[1]
+    model = SentimentClassifier(input_size).to(device)
 
 # Train the model
 def display_train_model():
+    prepare_data()
     train_model(model, train_loader, val_loader, epochs=1)
 
 # Function to evaluate model accuracy
