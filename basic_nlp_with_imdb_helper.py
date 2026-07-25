@@ -40,7 +40,7 @@ def display_load_dataset():
     global imdb, train_texts, train_labels, test_texts, test_labels
 
     # Load IMDB dataset
-    imdb = load_dataset("imdb")
+    imdb = load_dataset("stanfordnlp/imdb")
 
     # Extract training data
     train_texts = [sample["text"] for sample in imdb["train"]]
